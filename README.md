@@ -8,7 +8,7 @@ This is a docker recipe and accompanying scripts for an Nginx reverse proxy serv
 The recipe heavily utilizes docker-compose .env file for variable substitution. The following settings are implicated:
 
 #For the purposes of sites and hosts, sites are the front-end web site full DNS names, and the host list is the corresponding docker hosts name that its assigned to at the same order point in the list. Each site and host is seperated by a single space.
-#Sites & hosts protected via Oauth.
+Sites & hosts protected via Oauth. A sample .env file is as follows:
 ```
 oauth_sitelist=site1.mysite.com site2.mysite.com
 oauth_hostlist=site1 site1

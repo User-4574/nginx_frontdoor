@@ -1,0 +1,8 @@
+#!/bin/bash
+function die(){
+        for i in "${myservices[@]}";do
+                logger "stopping $i"
+                /etc/init.d/$i stop
+        done
+        exit 0
+}

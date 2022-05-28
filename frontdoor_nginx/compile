@@ -1,0 +1,22 @@
+#!/bin/bash
+#sets the name of the docker to compile to that of the current working directory.
+dockername=${PWD##*/}
+docker stop $dockername
+docker rm $dockername
+docker build -t jah/$dockername .
+docker run -d \
+        --publish 80:80 \
+        --publish 443:443\
+        --restart unless-stopped \
+        --network docker_bridge1 \
+        --hostname $dockername \
+        --mount type=bind,source="$(pwd)"/scripts,target=/scripts/ \
+	--mount type=bind,source="$(pwd)"/sites,target=/etc/nginx/conf.d/ \
+	--mount type=bind,source="$(pwd)"/letsencrypt,target=/etc/letsencrypt/ \
+        --name $dockername \
+jah/$dockername
+docker exec -it $dockername bash
+#        --mount type=bind,source="$(pwd)"/nginx,target=/etc/nginx/ \
+#        --mount type=bind,source="$(pwd)"/nginx,target=/etc/nginx/ \
+#        --mount source=inventoryprod,target=/inventory \
+

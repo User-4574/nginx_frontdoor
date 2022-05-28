@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#mydomains=(
+#	awx.l.taxsaverplan.com
+#	packages.l.taxsaverplan.com
+#	icinga.l.taxsaverplan.com
+#	graylog.l.taxsaverplan.com
+#	av.l.taxsaverplan.com
+#	its4vouch.l.taxsaverplan.com
+#	inventory.l.taxsaverplan.com
+#	monitoring.l.taxsaverplan.com
+#)
+
+for i in $(grep server_name /etc/nginx/conf.d/*.conf|awk '{print $2}'|sed 's/;//g'|grep -v localhost);do
+	if [ ! -f /etc/letsencrypt/live/$i/fullchain.pem ];then
+		echo "Domain $i detected in Nginx configuration but no LetsEncrypt cert generated, generating one now."
+		/usr/bin/certbot certonly \
+			--non-interactive --agree-tos \
+		        --dns-google \
+		        --dns-google-credentials /scripts/google.json \
+		        --register-unsafely-without-email \
+		        --dns-google-propagation-seconds 120 \
+		        --domains=$i 
+	fi
+done
+/usr/bin/certbot -q renew
+/etc/init.d/cron start
+/etc/init.d/nginx start

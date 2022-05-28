@@ -1,0 +1,17 @@
+#!/bin/bash
+function die(){
+        exit 0
+}
+trap die SIGTERM
+myusers=($oauth_users)
+touch /oauth2-proxy/users
+for i in "${myusers[@]}";do
+        echo $i>>/oauth2-proxy/users
+done
+
+
+#dockerize -delims "<<:>>" -template /templates/proxy.cfg.tmpl:/oauth2-proxy/proxy.cfg /oauth2-proxy/oauth2-proxy --config=/oauth2-proxy/proxy.cfg --set-xauthrequest
+dockerize -delims "<<:>>" -wait tcp://$redis_server:6379 -template /templates/proxy.cfg.tmpl:/oauth2-proxy/proxy.cfg /oauth2-proxy/oauth2-proxy --config=/oauth2-proxy/proxy.cfg --set-xauthrequest --session-store-type=redis --redis-connection-url=redis://$redis_server:6379/0 --set-authorization-header --reverse-proxy --pass-access-token --flush-interval=999s --show-debug-on-error --cookie-refresh=30s
+for (( ; ; ));do
+        sleep 50
+done

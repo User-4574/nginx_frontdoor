@@ -1,0 +1,37 @@
+http_address = ":4180"
+reverse_proxy = true
+# upstreams = [
+#     "https://test.l.taxsaverplan.com/"
+# ]
+logging_filename = ""
+#logging_filename = "oauth2log.log"
+## Logging configuration
+logging_max_size = 10000
+logging_max_age = 7
+logging_local_time = true
+logging_compress = false
+standard_logging = true
+standard_logging_format = "[{{.Timestamp}}] [{{.File}}] {{.Message}}"
+request_logging = true
+request_logging_format = "{{.Client}} - {{.Username}} [{{.Timestamp}}] {{.Host}} {{.RequestMethod}} {{.Upstream}} {{.RequestURI}} {{.Protocol}} {{.UserAgent}} {{.StatusCode}} {{.ResponseSize}} {{.RequestDuration}}"
+auth_logging = true
+auth_logging_format = "{{.Client}} - {{.Username}} [{{.Timestamp}}] [{{.Status}}] {{.Message}}"
+
+ pass_basic_auth = true
+ pass_user_headers = true
+ pass_host_header = true
+
+# email_domains = [
+#     "taxsaverplan.com"
+# ]
+client_id = "<< .Env.client_id >>" 
+client_secret = "<< .Env.client_secret >>"
+pass_access_token = true
+authenticated_emails_file = "/oauth2-proxy/users"
+# cookie_name = "_oauth2_proxy"
+cookie_secret = "<< .Env.cookie_secret >>"
+cookie_domains = "<< .Env.cookie_domains >>"
+# cookie_expire = "168h"
+# cookie_refresh = ""
+cookie_secure = true
+cookie_httponly = true

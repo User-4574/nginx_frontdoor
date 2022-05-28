@@ -1,0 +1,18 @@
+#!/bin/bash
+/usr/bin/certbot certonly \
+        --dns-google \
+        --dns-google-credentials /scripts/google.json \
+        --register-unsafely-without-email \
+        --dns-google-propagation-seconds 120 \
+        --domains=awx.l.taxsaverplan.com \
+        --domains=packages.l.taxsaverplan.com \
+        --domains=icinga.l.taxsaverplan.com \
+	--domains=graylog.l.taxsaverplan.com \
+	--domains=av.l.taxsaverplan.com \
+	--domains=its4vouch.l.taxsaverplan.com \
+	--domains=inventory.l.taxsaverplan.com \
+	--domains=inventorydev.l.taxsaverplan.com \
+	--domains=monitoring.l.taxsaverplan.com
+#>/dev/null 2>&1
+/etc/init.d/nginx reload
+

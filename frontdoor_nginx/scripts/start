@@ -1,0 +1,23 @@
+#!/bin/bash
+#most of the heavy lifting is here.
+source /scripts/start.functions
+myservices=(
+        cron
+        nginx
+)
+trap die SIGTERM
+#Process all the sites passed through as container variables and generate letsencrypt certfs for them if not present.
+process_unoauth_sites
+process_oauth_sites
+make_google_json
+process_letsencrypt
+#Start services.
+for i in "${myservices[@]}";do
+        logger "starting $i"
+        /etc/init.d/$i start
+done
+#This keeps the container running, regardless of service state.
+for (( ; ; ));do
+        sleep 50
+done
+

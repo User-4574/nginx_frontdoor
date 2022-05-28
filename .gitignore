@@ -1,0 +1,4 @@
+.env
+sites/*
+letsencrypt/*
+!*.gitkeep

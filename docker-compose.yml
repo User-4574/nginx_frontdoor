@@ -1,0 +1,61 @@
+version: '3.3'
+#Variables loaded from .env
+networks:
+  default:
+    external:
+      name: ${network_name}
+services:
+  frontdoor_nginx:
+    build:
+      context: frontdoor_nginx/
+    container_name: ${proj_name}-nginx
+    command: /scripts/start
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - "$PWD/sites:/etc/nginx/conf.d"
+#      - "$PWD/templates/:/templates"
+#      - "$PWD/frontdoor_nginx/scripts:/scripts"
+      - "$PWD/letsencrypt/:/etc/letsencrypt/"
+        #      - "/dockerfiles/inventorysystem/inventory_files:/inventory/"
+    environment:
+      oauth_sitelist: ${oauth_sitelist}
+      oauth_hostlist: ${oauth_hostlist}
+      unoauth_sitelist: ${unoauth_sitelist}
+      unoauth_hostlist: ${unoauth_hostlist}
+      oauth2hostname: ${proj_name}-oauth2-proxy
+      google_json_project_id: ${google_json_project_id}
+      google_json_private_key_id: ${google_json_private_key_id}
+      google_json_private_key: ${google_json_private_key}
+      google_json_client_email: ${google_json_client_email}
+      google_json_client_id: ${google_json_client_id}
+      google_json_auth_uri: ${google_json_auth_uri}
+      google_json_token_uri: ${google_json_token_uri}
+      google_json_auth_provider_x509_cert_url: ${google_json_auth_provider_x509_cert_url}
+      google_json_client_x509_cert_url: ${google_json_client_x509_cert_url}
+  frontdoor_oauth2-proxy:
+    build:
+      context: frontdoor_oauth2-proxy/
+    container_name: ${proj_name}-oauth2-proxy
+    command: /scripts/start
+    restart: unless-stopped
+#    volumes:
+#      - "$PWD/frontdoor_oauth2-proxy/scripts:/scripts"
+#      - "$PWD/templates/proxy.cfg.tmpl:/oauth2-proxy/proxy.cfg.tmpl"
+    depends_on: 
+      - frontdoor_oauth2-redis
+    environment:
+      client_id: ${client_id}
+      client_secret: ${client_secret}
+      oauth_users: ${oauth_users}
+      cookie_secret: ${cookie_secret}
+      cookie_domains: ${cookie_domains}
+      redis_server: ${proj_name}-oauth2-redis
+
+  frontdoor_oauth2-redis:
+    container_name: ${proj_name}-oauth2-redis
+    restart: unless-stopped
+    image: redis:alpine  
+  

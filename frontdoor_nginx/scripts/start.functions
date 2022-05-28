@@ -1,0 +1,74 @@
+#!/bin/bash
+#Redefine the passed sites as arrays
+myoauth_sitelist=($oauth_sitelist)
+myoauth_hostlist=($oauth_hostlist)
+myunoauth_sitelist=($unoauth_sitelist)
+myunoauth_hostlist=($unoauth_hostlist)
+#These must be exported to work with dockerize
+export myhost
+export mysite
+
+#echo ${#mysec_sitelist[@]}
+function process_oauth_sites(){
+    a=0
+    echo "Processing Oauth secured sites"
+    for b in "${myoauth_hostlist[@]}";do
+        myhost=${myoauth_hostlist[$a]}
+        mysite=${myoauth_sitelist[$a]}
+        echo $mysite
+        echo $myhost
+        if [ ! -f /etc/nginx/conf.d/$mysite.conf ];then
+            echo "Site $mysite does not have configuration in place, generating it."
+            /usr/local/bin/dockerize -template /templates/oauth_site.conf:/etc/nginx/conf.d/$mysite.conf
+        else
+            echo "Site $mysite has a configuration in place."
+        fi
+    #    a=$((a+1))
+        a=$a+1
+    done
+}
+function process_unoauth_sites(){
+    echo "Processing Non-Oauth secured sites"
+    d=0
+    for c in "${myunoauth_hostlist[@]}";do
+        myhost=${myunoauth_hostlist[$d]}
+        mysite=${myunoauth_sitelist[$d]}
+        #These are passed to dockerize via the exported variables above
+        echo $mysite
+        echo $myhost
+        if [ ! -f /etc/nginx/conf.d/$mysite.conf ];then
+            echo "Site $mysite does not have configuration in place, generating it."
+            /usr/local/bin/dockerize -template /templates/unoauth_site.conf:/etc/nginx/conf.d/$mysite.conf
+        else
+            echo "Site $mysite has a configuration in place."
+        fi
+        d=$d+1
+    done
+}
+function process_letsencrypt(){
+    echo "Insuring that Letsencrypt certificates exist for all Nginx domains"
+    #This grabs all of the sites in /etc/nginx/.conf.d and tries to grab an individual certificate for them if they don't have one already.
+    for i in $(grep server_name /etc/nginx/conf.d/*.conf|awk '{print $3}'|sed 's/;//g'|grep -v localhost);do
+            if [ ! -f /etc/letsencrypt/live/$i/fullchain.pem ];then
+                    echo "Domain $i detected in Nginx configuration but no LetsEncrypt cert generated, generating one now."
+                    /usr/bin/certbot certonly \
+                            --non-interactive --agree-tos \
+                            --dns-google \
+                            --dns-google-credentials /scripts/google.json \
+                            --register-unsafely-without-email \
+                            --dns-google-propagation-seconds 120 \
+                            --domains=$i
+            fi
+    done
+}
+function die(){
+        for i in "${myservices[@]}";do
+                logger "stopping $i"
+                /etc/init.d/$i stop
+        done
+        exit 0
+}
+
+function make_google_json(){
+        dockerize -delims "{{:}}" -template /templates/google.json.tmpl:/scripts/google.json
+}

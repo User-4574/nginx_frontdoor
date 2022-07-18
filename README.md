@@ -1,4 +1,4 @@
-This is a docker recipe and accompanying scripts for an Nginx reverse proxy server solution. It has the following capabilities/project goals:
+This is a docker recipe and accompanying scripts for an Nginx reverse proxy server solution with built-in oauth2 capabilities via oauth-proxy. It has the following capabilities/project goals:
 
 1)Automatic deployment and renewel of LetsEncrypt certificate via a Google api service account.
 

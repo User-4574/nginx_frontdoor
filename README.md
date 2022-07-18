@@ -10,6 +10,7 @@ The recipe heavily utilizes docker-compose .env file for variable substitution. 
 #For the purposes of sites and hosts, sites are the front-end web site full DNS names, and the host list is the corresponding docker hosts name that its assigned to at the same order point in the list. Each site and host is seperated by a single space.
 Sites & hosts protected via Oauth. A sample .env file is as follows:
 ```
+#Sites and hosts protected by Oauth:
 oauth_sitelist=site1.mysite.com site2.mysite.com
 oauth_hostlist=site1 site1
 

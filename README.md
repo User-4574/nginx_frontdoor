@@ -4,6 +4,7 @@ This is a docker recipe and accompanying scripts for an Nginx reverse proxy serv
 
 2)Bundled Oauth2-proxy capabilities against a Google authentication oauth2 set of credentials. Backed by Redis for stability.
 
+Each sitelist and hostlist are arrays that the startup scripts will loop through, and in order for Nginx to start correctly you must have Docker containers present on the same docker network as nginx_frontdoor is configure on, or it will fail to start.
 
 The recipe heavily utilizes docker-compose .env file for variable substitution. The following settings are implicated:
 
@@ -12,7 +13,7 @@ Sites & hosts protected via Oauth. A sample .env file is as follows:
 ```
 #Sites and hosts protected by Oauth:
 oauth_sitelist=site1.mysite.com site2.mysite.com
-oauth_hostlist=site1 site1
+oauth_hostlist=site1 site2
 
 #Sites and hosts not protected by Oauth:
 unoauth_sitelist=protected1.mysite.com protected2.mysite.com
